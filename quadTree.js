@@ -7,9 +7,9 @@ class QuadTree {
     this.width = width;
     this.height = height;
 
-    this.points = [];
+    this.particles = [];
     this.divided = false;
-    this.capacity = 4;
+    this.capacity = 5;
     this.subtrees = [];
   }
 
@@ -29,6 +29,7 @@ class QuadTree {
   //   let d = vector_max(q).mag() + min(vector_maxcomp(q), 0);
   //   return d < 0;
   // }
+
   inside(p) {
     let x = p.pos.x;
     let y = p.pos.y;
@@ -36,12 +37,7 @@ class QuadTree {
     let w = this.width;
     let h = this.height;
 
-    return (
-      x + p.radius < this.x + w &&
-      x - p.radius >= this.x &&
-      y + p.radius < this.y + h &&
-      y - p.radius >= this.y
-    );
+    return x < this.x + w && x >= this.x && y < this.y + h && y >= this.y;
   }
 
   insert(p) {
@@ -50,45 +46,36 @@ class QuadTree {
       return false;
     }
     if (!this.divided) {
-      if (this.points.length < this.capacity) {
-        this.points.push(p);
+      if (this.particles.length < this.capacity) {
+        this.particles.push(p);
       } else {
         // create subtrees
         // top left
+
         this.subtrees.push(
           new QuadTree(this.x, this.y, this.width / 2, this.height / 2)
         );
         // top right
         this.subtrees.push(
-          new QuadTree(
-            this.x + this.width / 2,
-            this.y,
-            this.width / 2,
-            this.height / 2
-          )
+          new QuadTree(this.x + this.dim.x, this.y, this.dim.x, this.dim.y)
         );
         // bottom left
         this.subtrees.push(
-          new QuadTree(
-            this.x,
-            this.y + this.height / 2,
-            this.width / 2,
-            this.height / 2
-          )
+          new QuadTree(this.x, this.y + this.dim.y, this.dim.x, this.dim.y)
         );
         // bottom right
         this.subtrees.push(
           new QuadTree(
-            this.x + this.width / 2,
-            this.y + this.height / 2,
-            this.width / 2,
-            this.height / 2
+            this.x + this.dim.x,
+            this.y + this.dim.y,
+            this.dim.x,
+            this.dim.y
           )
         );
         // becomes divided
         this.divided = true;
-        // push current points into subtrees
-        for (let existing_point of this.points) {
+        // push current particles into subtrees
+        for (let existing_point of this.particles) {
           for (let tree of this.subtrees) {
             if (tree.insert(existing_point)) {
               continue;
@@ -96,24 +83,36 @@ class QuadTree {
           }
         }
         // empty out point array
-        this.points.length = 0;
+        this.particles.length = 0;
         // DO NOT push new point into subtree
       }
     }
     if (this.divided) {
       // push new point into subtrees
       for (let tree of this.subtrees) {
-        if (tree.insert(p)) {
-          continue;
-        }
+        if (tree.insert(p)) return true;
       }
     }
     return true;
   }
+
   empty() {
-    this.points = [];
+    this.particles = [];
     this.divided = false;
     this.capacity = 4;
     this.subtrees = [];
+  }
+
+  checkCollision() {
+    for (let i = 0; i < this.particles.length; i++) {
+      for (let j = i + 1; j < this.particles.length; j++) {
+        if (this.particles[i].collides(this.particles[j])) {
+          this.particles[i].resolveCollision(this.particles[j]);
+        }
+      }
+    }
+    for (let tree of this.subtrees) {
+      tree.checkCollision();
+    }
   }
 }

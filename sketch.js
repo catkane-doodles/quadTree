@@ -1,13 +1,13 @@
-let particleSize = 10;
+let particleSize = 5;
 
-let width = 800;
+let width = 400;
 let height = 800;
 
 let fr = 30;
 let cnv;
 let z = 0;
 
-let totalParticles = 1000;
+let totalParticles = 2000;
 
 let particles = [];
 let quadTree;
@@ -41,6 +41,7 @@ function draw() {
     //   }
     // }
   }
-  quadTree.show();
+  quadTree.checkCollision();
+  // quadTree.show();
   quadTree.empty();
 }
