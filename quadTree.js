@@ -37,7 +37,12 @@ class QuadTree {
     let w = this.width;
     let h = this.height;
 
-    return x < this.x + w && x >= this.x && y < this.y + h && y >= this.y;
+    return (
+      x - p.radius < this.x + w &&
+      x + p.radius >= this.x &&
+      y - p.radius < this.y + h &&
+      y + p.radius >= this.y
+    );
   }
 
   insert(p) {
@@ -53,7 +58,7 @@ class QuadTree {
         // top left
 
         this.subtrees.push(
-          new QuadTree(this.x, this.y, this.width / 2, this.height / 2)
+          new QuadTree(this.x, this.y, this.dim.x, this.dim.y)
         );
         // top right
         this.subtrees.push(
@@ -90,7 +95,7 @@ class QuadTree {
     if (this.divided) {
       // push new point into subtrees
       for (let tree of this.subtrees) {
-        if (tree.insert(p)) return true;
+        tree.insert(p);
       }
     }
     return true;

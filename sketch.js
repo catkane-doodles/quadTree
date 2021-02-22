@@ -22,7 +22,12 @@ function setup() {
   // let numberOfCircles = random(totalParticles);
   for (let i = 0; i < totalParticles; i++) {
     particles.push(
-      new Particle(random(width), random(height), particleSize, random(100))
+      new Particle(
+        random(particleSize, width - particleSize),
+        random(particleSize, height - particleSize),
+        particleSize,
+        random(100)
+      )
     );
   }
 }

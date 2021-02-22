@@ -77,14 +77,26 @@ class Particle {
   move() {
     this.pos.add(this.vel);
     this.z += 0.01;
+    let flipX = false;
+    if (this.pos.x + this.radius > width) {
+      this.pos.x = width - this.radius;
+      flipX = true;
+    } else if (this.pos.x - this.radius < 0) {
+      this.pos.x = this.radius;
+      flipX = true;
+    }
 
-    this.vel.x =
-      this.pos.x + this.radius > width || this.pos.x - this.radius < 0
-        ? -this.vel.x
-        : this.vel.x;
-    this.vel.y =
-      this.pos.y + this.radius > height || this.pos.y - this.radius < 0
-        ? -this.vel.y
-        : this.vel.y;
+    this.vel.x = flipX ? -this.vel.x : this.vel.x;
+
+    let flipY = false;
+    if (this.pos.y + this.radius > height) {
+      this.pos.y = height - this.radius;
+      flipY = true;
+    } else if (this.pos.y - this.radius < 0) {
+      this.pos.y = this.radius;
+      flipY = true;
+    }
+
+    this.vel.y = flipY ? -this.vel.y : this.vel.y;
   }
 }
